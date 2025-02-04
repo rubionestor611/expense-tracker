@@ -1,3 +1,6 @@
+/*
+Copyright © 2025 nestordrubio9@gmail.com
+*/
 package misc
 
 import "time"
