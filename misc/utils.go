@@ -63,9 +63,7 @@ func (prompter *Prompter) PromptUserFreeForm(prompt string) string {
 	ret := ""
 
 	for {
-		fmt.Println(prompt)
-
-		fmt.Print("> ")
+		fmt.Printf("%s\n> ", prompt)
 		ans, err := prompter.reader.ReadString('\n')
 		fmt.Println()
 		if err != nil {
@@ -81,6 +79,43 @@ func (prompter *Prompter) PromptUserFreeForm(prompt string) string {
 		}
 
 		ret = ans
+		break
+	}
+
+	return ret
+}
+
+func (prompter *Prompter) PromptUserFloat(prompt string, currency bool) float64 {
+	if &prompter.reader == nil {
+		prompter.reader = *bufio.NewReader(os.Stdin)
+	}
+
+	var placeholder string
+	if currency {
+		placeholder = "> $"
+	} else {
+		placeholder = "> "
+	}
+
+	ret := float64(0)
+
+	for {
+		fmt.Printf("%s\n%s ", prompt, placeholder)
+
+		ans, err := prompter.reader.ReadString('\n')
+		fmt.Println()
+		if err != nil {
+			fmt.Println("There was an error reading your answer. Try again.\n")
+			continue
+		}
+
+		ansValue, err := strconv.ParseFloat(strings.TrimSpace(ans[:len(ans)-1]), 64)
+		if err != nil {
+			fmt.Printf("%s could not be parsed as a float. Please provide a valid float.\n\n", ans)
+			continue
+		}
+
+		ret = ansValue
 		break
 	}
 
