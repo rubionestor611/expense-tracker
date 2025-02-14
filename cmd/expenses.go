@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"strings"
 
@@ -16,7 +15,8 @@ var expenseCmd = &cobra.Command{
 		var command string
 
 		if len(args) == 0 {
-			fmt.Println("You must select an action like add, remove, list, view")
+			cmd.Help()
+			return
 		} else {
 			command = strings.ToLower(args[0])
 
