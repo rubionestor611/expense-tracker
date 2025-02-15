@@ -12,20 +12,23 @@ const (
 	Utilities
 	Entertainment
 	Debt
-	Misc
 	Home_Goods
+	Misc
+	Nestor_Personal
+	Alyssa_Personal
+	Oliver_Personal
 )
 
 func (e ExpenseCategory) String() string {
-	return [...]string{"Mortgage", "Food", "Utilities", "Entertainment", "Debt", "Misc", "Home_Goods"}[e]
+	return [...]string{"Mortgage", "Food", "Utilities", "Entertainment", "Debt", "Home_Goods", "Misc", "Nestor_Personal", "Alyssa_Personal", "Oliver_Personal"}[e]
 }
 
 func GetExpenseCategories() []ExpenseCategory {
-	return []ExpenseCategory{Mortgage, Food, Utilities, Entertainment, Debt, Misc, Home_Goods}
+	return []ExpenseCategory{Mortgage, Food, Utilities, Entertainment, Debt, Home_Goods, Misc}
 }
 
 func GetExpenseCategoryStrings() []string {
-	return []string{"Mortgage", "Food", "Utilities", "Entertainment", "Debt", "Misc", "Home_Goods"}
+	return []string{"Mortgage", "Food", "Utilities", "Entertainment", "Debt", "Home_Goods", "Misc", "Nestor_Personal", "Alyssa_Personal", "Oliver_Personal"}
 }
 
 func GetExpenseCategoryByIndex(index int) (string, error) {
