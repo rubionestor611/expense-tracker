@@ -25,7 +25,7 @@ func formatCurrency(val any) (string, error) {
 		formatted := fmt.Sprintf("$%.2f", val)
 		return formatted, nil
 	default:
-		errorMsg := fmt.Sprintf("Currently unable to format a value of the type %s")
+		errorMsg := fmt.Sprintf("Currently unable to format a value of the type %s", typeOfVal.Kind())
 		fmt.Println(errorMsg)
 		return "", errors.New(errorMsg)
 	}
@@ -40,7 +40,7 @@ func AddExpense() (err error) {
 	date, err := misc.GetTimeInTimezone("EST")
 	if err != nil {
 		fmt.Println("Oops! Looks like we can't get today's date. Nestor needs to look into this...")
-		errors.New("Couldn't get time")
+		return err
 	}
 
 	// get category of transaction
@@ -64,7 +64,7 @@ func AddExpense() (err error) {
 	formattedPurchaseAmt, err := formatCurrency(purchaseAmount)
 
 	if err != nil {
-		errors.New(err.Error())
+		return err
 	}
 
 	fmt.Println(date, categorySelection, purchaseStore, formattedPurchaseAmt)

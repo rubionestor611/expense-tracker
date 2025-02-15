@@ -31,7 +31,7 @@ func GetExpenseCategoryStrings() []string {
 func GetExpenseCategoryByIndex(index int) (string, error) {
 	strings := GetExpenseCategoryStrings()
 	if index < 0 || index >= len(strings) {
-		return "", errors.New("Index out of bounds on Expense Category enum")
+		return "", errors.New("index out of bounds on Expense Category enum")
 	}
 
 	return strings[index], nil
