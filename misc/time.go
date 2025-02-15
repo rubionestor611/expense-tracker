@@ -5,11 +5,15 @@ package misc
 
 import "time"
 
-func GetTimeInTimezone(timezone string) (string, error) {
+func GetTimeInTimezone(timezone string) (*time.Time, error) {
 	location, err := time.LoadLocation(timezone)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	currentTime := time.Now().In(location)
-	return currentTime.Format(time.RFC1123), nil
+	return &currentTime, nil
+}
+
+func ISOFormat(timeVal time.Time) string {
+	return timeVal.Format(time.RFC3339)
 }

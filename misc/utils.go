@@ -2,8 +2,10 @@ package misc
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -120,4 +122,32 @@ func (prompter *Prompter) PromptUserFloat(prompt string, currency bool) float64 
 	}
 
 	return ret
+}
+
+func FormatCurrency(val any) (string, error) {
+	typeOfVal := reflect.ValueOf(val)
+
+	switch typeOfVal.Kind() {
+	case reflect.String:
+		floatVal, err := strconv.ParseFloat(val.(string), 64)
+		if err != nil {
+			fmt.Printf("There was an error formatting your currency of %s\n", val)
+			return "", err
+		}
+
+		if floatVal < 0 {
+			return fmt.Sprintf("-$%.2f", floatVal*-1), nil
+		}
+		return fmt.Sprintf("$%.2f", floatVal), nil
+	case reflect.Float64, reflect.Float32:
+		if val.(float64) < 0 {
+			return fmt.Sprintf("-$%.2f", val.(float64)*-1), nil
+		}
+
+		return fmt.Sprintf("$%.2f", val), nil
+	default:
+		errorMsg := fmt.Sprintf("Currently unable to format a value of the type %s", typeOfVal.Kind())
+		fmt.Println(errorMsg)
+		return "", errors.New(errorMsg)
+	}
 }

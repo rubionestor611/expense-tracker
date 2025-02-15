@@ -1,34 +1,24 @@
 package expenses
 
 import (
-	"errors"
+	"context"
 	"fmt"
-	"reflect"
-	"strconv"
 
 	"example.com/nestor-expense-tracker/misc"
 )
 
-func formatCurrency(val any) (string, error) {
-	typeOfVal := reflect.ValueOf(val)
+func addToMongo(expense Expense) error {
+	mongoClient := GetMongoClient()
 
-	switch typeOfVal.Kind() {
-	case reflect.String:
-		floatVal, err := strconv.ParseFloat(val.(string), 64)
-		if err != nil {
-			fmt.Printf("There was an error formatting your currency of %s\n", val)
-			return "", err
-		}
+	expenseCollection := mongoClient.Database("expenses").Collection("expenses")
 
-		return fmt.Sprintf("$%.2f", floatVal), nil
-	case reflect.Float64, reflect.Float32:
-		formatted := fmt.Sprintf("$%.2f", val)
-		return formatted, nil
-	default:
-		errorMsg := fmt.Sprintf("Currently unable to format a value of the type %s", typeOfVal.Kind())
-		fmt.Println(errorMsg)
-		return "", errors.New(errorMsg)
+	_, err := expenseCollection.InsertOne(context.TODO(), expense)
+	if err != nil {
+		return err
 	}
+
+	fmt.Printf("Successfully inserted expense %v", expense)
+	return nil
 }
 
 func AddExpense() (err error) {
@@ -42,6 +32,7 @@ func AddExpense() (err error) {
 		fmt.Println("Oops! Looks like we can't get today's date. Nestor needs to look into this...")
 		return err
 	}
+	formattedDate := misc.ISOFormat(*date)
 
 	// get category of transaction
 	categoryIndex := prompter.PromptUserOptions("Select the type of purchase:", options)
@@ -60,14 +51,30 @@ func AddExpense() (err error) {
 	}
 
 	// get the amount of the transaction
-	purchaseAmount := prompter.PromptUserFloat("How much was the transaction?", true)
-	formattedPurchaseAmt, err := formatCurrency(purchaseAmount)
+	var purchaseAmount float64
+	var formattedPurchaseAmt string
+	for {
+		purchaseAmount = prompter.PromptUserFloat("How much was the transaction?", true)
 
-	if err != nil {
-		return err
+		if purchaseAmount > 0 {
+			formattedPurchaseAmt, err = misc.FormatCurrency(purchaseAmount)
+
+			if err != nil {
+				return err
+			}
+			break
+		}
+
+		fmt.Printf("You must provide a positive amount for the purchase you made. Please try again\n\n")
 	}
 
-	fmt.Println(date, categorySelection, purchaseStore, formattedPurchaseAmt)
+	fmt.Println(formattedDate, categorySelection, purchaseStore, formattedPurchaseAmt)
+
+	err = addToMongo(Expense{Date: formattedDate, Category: categorySelection, Store: purchaseStore, Amount: purchaseAmount})
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
 
 	return nil
 }

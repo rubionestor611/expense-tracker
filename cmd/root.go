@@ -4,8 +4,11 @@ Copyright © 2025 nestordrubio9@gmail.com
 package cmd
 
 import (
+	"log"
 	"os"
 
+	"example.com/nestor-expense-tracker/expenses"
+	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +27,15 @@ func Execute() {
 }
 
 func init() {
+
+	// load env vars
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	// connect to mongo
+	expenses.InitMongo(os.Getenv("MONGO_CONNECTION_STR"))
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.

@@ -11,7 +11,7 @@ import (
 )
 
 type Mongo struct {
-	client mongo.Client
+	client *mongo.Client
 }
 
 var (
@@ -31,15 +31,22 @@ func InitMongo(uri string) *Mongo {
 			log.Fatalf("Could not ping MongoDB: %v", err)
 		}
 
-		instance = &Mongo{client: *client}
-		fmt.Println("Connected to MongoDB successfully!")
+		instance = &Mongo{client: client}
 
-		defer func() {
-			if err = client.Disconnect(context.TODO()); err != nil {
-				panic(err)
-			}
-		}()
+		fmt.Println("Connected to MongoDB successfully!")
 	})
 
 	return instance
+}
+
+func GetMongoInstance() *Mongo {
+	if instance == nil {
+		log.Fatal("MongoDB is not initialized. Call InitMongo first")
+	}
+
+	return instance
+}
+
+func GetMongoClient() *mongo.Client {
+	return GetMongoInstance().client
 }
