@@ -3,6 +3,7 @@ package expenses
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"example.com/nestor-expense-tracker/misc"
 )
@@ -17,7 +18,7 @@ func addToMongo(expense Expense) error {
 		return err
 	}
 
-	fmt.Printf("Successfully inserted expense %v", expense)
+	fmt.Printf("Successfully inserted expense\n{\n\tdate: %s,\n\tcategory: %s,\n\tstore: %s,\n\tamount: %.2f\n}", misc.ISOFormat(expense.Date), expense.Category, expense.Store, expense.Amount)
 	return nil
 }
 
@@ -45,9 +46,10 @@ func AddExpense() (err error) {
 	// get the store the purchase was at
 	var purchaseStore string
 	if categoryIndex == int(Mortgage) {
-		purchaseStore = "Mortgage Holder"
+		purchaseStore = "mortgage holder"
 	} else {
 		purchaseStore = prompter.PromptUserFreeForm("What store was the purchase in?")
+		purchaseStore = strings.ToLower(purchaseStore)
 	}
 
 	// get the amount of the transaction
@@ -70,7 +72,7 @@ func AddExpense() (err error) {
 
 	fmt.Println(formattedDate, categorySelection, purchaseStore, formattedPurchaseAmt)
 
-	err = addToMongo(Expense{Date: formattedDate, Category: categorySelection, Store: purchaseStore, Amount: purchaseAmount})
+	err = addToMongo(Expense{Date: *date, Category: categorySelection, Store: purchaseStore, Amount: purchaseAmount})
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
