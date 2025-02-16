@@ -3,12 +3,11 @@ package expenses
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"example.com/nestor-expense-tracker/misc"
 )
 
-func addToMongo(expense Expense) error {
+func AddToMongo(expense Expense) error {
 	mongoClient := GetMongoClient()
 
 	expenseCollection := mongoClient.Database("expenses").Collection("expenses")
@@ -19,64 +18,5 @@ func addToMongo(expense Expense) error {
 	}
 
 	fmt.Printf("Successfully inserted expense\n{\n\tdate: %s,\n\tcategory: %s,\n\tstore: %s,\n\tamount: %.2f\n}", misc.ISOFormat(expense.Date), expense.Category, expense.Store, expense.Amount)
-	return nil
-}
-
-func AddExpense() (err error) {
-	options := GetExpenseCategoryStrings()
-	prompter := misc.Prompter{}
-	prompter.Init()
-
-	// get date of transaction
-	date, err := misc.GetTimeInTimezone("EST")
-	if err != nil {
-		fmt.Println("Oops! Looks like we can't get today's date. Nestor needs to look into this...")
-		return err
-	}
-	formattedDate := misc.ISOFormat(*date)
-
-	// get category of transaction
-	categoryIndex := prompter.PromptUserOptions("Select the type of purchase:", options)
-	categorySelection, err := GetExpenseCategoryByIndex(categoryIndex)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-
-	// get the store the purchase was at
-	var purchaseStore string
-	if categoryIndex == int(Mortgage) {
-		purchaseStore = "mortgage holder"
-	} else {
-		purchaseStore = prompter.PromptUserFreeForm("What store was the purchase in?")
-		purchaseStore = strings.ToLower(purchaseStore)
-	}
-
-	// get the amount of the transaction
-	var purchaseAmount float64
-	var formattedPurchaseAmt string
-	for {
-		purchaseAmount = prompter.PromptUserFloat("How much was the transaction?", true)
-
-		if purchaseAmount > 0 {
-			formattedPurchaseAmt, err = misc.FormatCurrency(purchaseAmount)
-
-			if err != nil {
-				return err
-			}
-			break
-		}
-
-		fmt.Printf("You must provide a positive amount for the purchase you made. Please try again\n\n")
-	}
-
-	fmt.Println(formattedDate, categorySelection, purchaseStore, formattedPurchaseAmt)
-
-	err = addToMongo(Expense{Date: *date, Category: categorySelection, Store: purchaseStore, Amount: purchaseAmount})
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
-	}
-
 	return nil
 }

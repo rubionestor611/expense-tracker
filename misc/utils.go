@@ -58,7 +58,7 @@ func (prompter *Prompter) PromptUserOptions(prompt string, options []string) int
 }
 
 func (prompter *Prompter) PromptUserFreeForm(prompt string) string {
-	if &prompter.reader == nil {
+	if prompter.reader.Size() == 0 {
 		prompter.reader = *bufio.NewReader(os.Stdin)
 	}
 

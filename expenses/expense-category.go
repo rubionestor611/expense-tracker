@@ -39,3 +39,12 @@ func GetExpenseCategoryByIndex(index int) (string, error) {
 
 	return strings[index], nil
 }
+
+func IsExpenseCategory(category string) bool {
+	for _, validCategory := range GetExpenseCategoryStrings() {
+		if validCategory == category {
+			return true
+		}
+	}
+	return false
+}
