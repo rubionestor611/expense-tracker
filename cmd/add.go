@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"strings"
@@ -82,10 +83,14 @@ var addExpenseCmd = &cobra.Command{
 			submittingExpense.Store = strings.ToLower(prompter.PromptUserFreeForm("What store was the purchase in?"))
 		}
 
-		addErr := expenses.AddToMongo(submittingExpense)
-		if addErr != nil {
-			log.Fatalf("Error adding expense: %v", addErr)
+		expenseCollection := expenses.ExpensesCollection()
+
+		_, err := expenseCollection.InsertOne(context.TODO(), submittingExpense)
+		if err != nil {
+			log.Fatalf("Error adding expense: %v", err)
 		}
+
+		fmt.Printf("Successfully submitted expense\n%s\n\n", submittingExpense)
 	},
 }
 

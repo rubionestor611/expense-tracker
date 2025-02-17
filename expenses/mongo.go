@@ -2,7 +2,6 @@ package expenses
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"sync"
 
@@ -32,8 +31,6 @@ func InitMongo(uri string) *Mongo {
 		}
 
 		instance = &Mongo{client: client}
-
-		fmt.Println("Connected to MongoDB successfully!")
 	})
 
 	return instance
@@ -49,4 +46,8 @@ func GetMongoInstance() *Mongo {
 
 func GetMongoClient() *mongo.Client {
 	return GetMongoInstance().client
+}
+
+func ExpensesCollection() *mongo.Collection {
+	return GetMongoClient().Database("expenses").Collection("expenses")
 }
