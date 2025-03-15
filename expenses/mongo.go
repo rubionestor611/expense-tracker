@@ -51,3 +51,7 @@ func GetMongoClient() *mongo.Client {
 func ExpensesCollection() *mongo.Collection {
 	return GetMongoClient().Database("expenses").Collection("expenses")
 }
+
+func CategoriesCollection() *mongo.Collection {
+	return GetMongoClient().Database("expenses").Collection("categories")
+}

@@ -50,7 +50,7 @@ var summarizeExpenses = &cobra.Command{
 		if filterCategory != "" {
 			// see if category is in list of them
 			for !expenses.IsExpenseCategory(filterCategory) {
-				userInput := prompter.PromptUserOptions("Select the kind of category you want a summary for:", expenses.GetExpenseCategoryStrings())
+				userInput := prompter.PromptUserOptions("Select the kind of category you want a summary for:", expenses.GetExpenseCategoryNames())
 				categorySelected, err := expenses.GetExpenseCategoryByIndex(userInput)
 				if err != nil {
 					fmt.Println(err.Error())
@@ -103,5 +103,5 @@ func init() {
 	summarizeExpenses.Flags().StringVarP(&filterCategory, "category", "c", "", "Specify the category to get a summary for")
 	summarizeExpenses.Flags().StringVarP(&filterStore, "store", "s", "", "Specify the store in which your summary will apply to")
 
-	rootCmd.AddCommand(summarizeExpenses)
+	RootCmd.AddCommand(summarizeExpenses)
 }

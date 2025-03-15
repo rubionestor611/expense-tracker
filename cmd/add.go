@@ -24,7 +24,11 @@ var addExpenseCmd = &cobra.Command{
 	Short: "Add an expense entry",
 	Run: func(cmd *cobra.Command, args []string) {
 		prompter := misc.Prompter{}
-		allCategories := expenses.GetExpenseCategoryStrings()
+		allCategories, err := expenses.GetExpenseCategories()
+		if err != nil {
+			log.Fatalf(err.Error())
+		}
+		categoryNames := expenses.ExtractCategoryNames(allCategories)
 
 		submittingExpense := expenses.Expense{
 			Date:     time.Now(),
@@ -65,7 +69,7 @@ var addExpenseCmd = &cobra.Command{
 				fmt.Printf("You must provide a category for the expense from the available options\n\n")
 			}
 
-			categoryIndex := prompter.PromptUserOptions("Select the type of purchase:", allCategories)
+			categoryIndex := prompter.PromptUserOptions("Select the type of purchase:", categoryNames)
 			categorySelection, err := expenses.GetExpenseCategoryByIndex(categoryIndex)
 			if err != nil {
 				continue
@@ -75,8 +79,14 @@ var addExpenseCmd = &cobra.Command{
 			}
 		}
 
-		if strings.EqualFold(submittingExpense.Category, expenses.Mortgage.String()) {
-			submittingExpense.Store = "mortgage holder"
+		// get the category. if the category has a defaultStore use that
+		for _, cat := range allCategories {
+			if strings.EqualFold(cat.Name, submittingExpense.Category) {
+				if len(cat.DefaultStore) > 0 {
+					submittingExpense.Store = cat.DefaultStore
+				}
+				break
+			}
 		}
 
 		for strings.EqualFold(submittingExpense.Store, "") {
@@ -85,7 +95,7 @@ var addExpenseCmd = &cobra.Command{
 
 		expenseCollection := expenses.ExpensesCollection()
 
-		_, err := expenseCollection.InsertOne(context.TODO(), submittingExpense)
+		_, err = expenseCollection.InsertOne(context.TODO(), submittingExpense)
 		if err != nil {
 			log.Fatalf("Error adding expense: %v", err)
 		}
@@ -100,5 +110,5 @@ func init() {
 	addExpenseCmd.Flags().StringVarP(&category, "category", "c", "", "Specify the category that the transaction falls under. If no match found, you will be prompted again")
 	addExpenseCmd.Flags().StringVarP(&store, "store", "s", "", "Specify the store in which the expense was made")
 
-	rootCmd.AddCommand(addExpenseCmd)
+	RootCmd.AddCommand(addExpenseCmd)
 }

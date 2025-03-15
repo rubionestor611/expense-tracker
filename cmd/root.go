@@ -7,20 +7,21 @@ import (
 	"log"
 	"os"
 
+	"example.com/nestor-expense-tracker/cmd/categories"
 	"example.com/nestor-expense-tracker/expenses"
 	"github.com/joho/godotenv"
 	"github.com/spf13/cobra"
 )
 
 // rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "nestor-expense-tracker",
 	Short: "My personal expense tracker",
 	Long:  `A Golang-based Cobra command line interface (CLI) which I built to manage expenses without a fancy UI and so I can feel cool and hackery while I do it.`,
 }
 
 func Execute() {
-	err := rootCmd.Execute()
+	err := RootCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
@@ -44,5 +45,6 @@ func init() {
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	RootCmd.AddCommand(categories.CategoriesCmd)
 }
