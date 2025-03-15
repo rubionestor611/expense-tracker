@@ -124,6 +124,11 @@ func (prompter *Prompter) PromptUserFloat(prompt string, currency bool) float64 
 	return ret
 }
 
+func (prompter *Prompter) PromptUserEnterKey(prompt string) {
+	fmt.Println(prompt)
+	fmt.Scanln()
+}
+
 func FormatCurrency(val any) (string, error) {
 	typeOfVal := reflect.ValueOf(val)
 

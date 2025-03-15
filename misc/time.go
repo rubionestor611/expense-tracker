@@ -47,3 +47,7 @@ func GetMonthRange(dateStr string) (time.Time, time.Time, error) {
 
 	return startDate, endDate, nil
 }
+
+func FormatDateMMDDYYYY(date time.Time) string {
+	return date.Format("01-02-2006")
+}
