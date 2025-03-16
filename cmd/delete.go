@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"log"
 
-	"example.com/nestor-expense-tracker/expenses"
-	"example.com/nestor-expense-tracker/misc"
+	"example.com/expense-tracker/expenses"
+	"example.com/expense-tracker/misc"
 	"github.com/spf13/cobra"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"example.com/nestor-expense-tracker/expenses"
+	"example.com/expense-tracker/expenses"
 	"github.com/spf13/cobra"
 )
 

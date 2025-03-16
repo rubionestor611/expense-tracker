@@ -1,4 +1,4 @@
-module example.com/nestor-expense-tracker
+module example.com/expense-tracker
 
 go 1.22.2
 

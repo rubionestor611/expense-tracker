@@ -12,8 +12,8 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"example.com/nestor-expense-tracker/expenses"
-	"example.com/nestor-expense-tracker/misc"
+	"example.com/expense-tracker/expenses"
+	"example.com/expense-tracker/misc"
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
 	"go.mongodb.org/mongo-driver/bson"
