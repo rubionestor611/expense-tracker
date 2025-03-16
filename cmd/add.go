@@ -10,6 +10,7 @@ import (
 	"example.com/nestor-expense-tracker/expenses"
 	"example.com/nestor-expense-tracker/misc"
 	"github.com/spf13/cobra"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 var (
@@ -31,6 +32,7 @@ var addExpenseCmd = &cobra.Command{
 		categoryNames := expenses.ExtractCategoryNames(allCategories)
 
 		submittingExpense := expenses.Expense{
+			ID:       primitive.NewObjectID(),
 			Date:     time.Now(),
 			Amount:   amount,
 			Category: category,
