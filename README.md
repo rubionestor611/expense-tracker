@@ -2,10 +2,10 @@
 
 This is a personal project designed to help me maintain control over household expenses while allowing me to do it while doing something I love: developing tech solutions through programming.
 
-# How Is it Used?
+## How Is it Used?
 After any expense(s), I open a terminal and quickly type my command `expense-tracker add` which will run me through questions for defining the expense(s). At the end of the month, I can run `expense-tracker summarize` and see some details on how our spending was for the month.
 
-# Cool Features
+## Cool Features
 ### Excel Spreadsheet Export
 * Adding --export to the `summarize` command will open a temporary excel spreadhseet populated with the data being used in the summary. This allows for any further exploration of the data to be done easily
 ### Short Args for CLI Commands
