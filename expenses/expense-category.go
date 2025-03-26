@@ -85,3 +85,12 @@ func AddExpenseCategory(cat ExpenseCategory) error {
 
 	return nil
 }
+
+func DeleteExpenseCategory(name string) (bool, error) {
+	res, err := CategoriesCollection().DeleteOne(context.TODO(), bson.M{"name": name})
+	if err != nil {
+		return false, err
+	}
+
+	return res.DeletedCount == 1, nil
+}

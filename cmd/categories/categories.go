@@ -12,4 +12,5 @@ var CategoriesCmd = &cobra.Command{
 func init() {
 	CategoriesCmd.AddCommand(addCategoryCommand)
 	CategoriesCmd.AddCommand(listCommand)
+	CategoriesCmd.AddCommand(removeCategoryCommand)
 }
