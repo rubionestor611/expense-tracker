@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strconv"
 	"time"
 	"unicode/utf8"
@@ -25,6 +26,12 @@ var (
 	filterStore    string
 	export         bool
 )
+
+type summarizedCategory struct {
+	category        string
+	numTransactions int
+	amount          float64
+}
 
 var summarizeExpenses = &cobra.Command{
 	Use:   "summarize",
@@ -90,12 +97,42 @@ var summarizeExpenses = &cobra.Command{
 			return
 		}
 
-		totalSpent, totalTxs := 0.00, 0
+		categoryMap := make(map[string]summarizedCategory)
+		totalSpent := 0.00
 
 		for _, expense := range queriedExpenses {
-			fmt.Println(expense)
+			// NOTE: If not defined, the zero-value of summarizedCategory will be returned
+			// so we effectively get a pre-defined struct from this
+			curData := categoryMap[expense.Category]
+
+			curData.category = expense.Category
+			curData.amount += expense.Amount
+			curData.numTransactions += 1
+
+			categoryMap[expense.Category] = curData
 			totalSpent += expense.Amount
-			totalTxs += 1
+		}
+
+		// Sort the keys of the map by order of spent amount
+		// 1. Get data into a slice
+		var sortedCategories []summarizedCategory
+		for _, value := range categoryMap {
+			sortedCategories = append(sortedCategories, value)
+		}
+		// 2. Sort slice
+		sort.Slice(sortedCategories, func(i, j int) bool {
+			return sortedCategories[i].amount > sortedCategories[j].amount
+		})
+
+		// print sorted list
+		for _, entry := range sortedCategories {
+			spentStr, err := misc.FormatCurrency(entry.amount)
+
+			if err != nil {
+				log.Fatalf("Error formatting spent amount for %s category. %s\n\n", entry.category, err.Error())
+			}
+
+			fmt.Printf("- %s: %s in %d\n", entry.category, spentStr, entry.numTransactions)
 		}
 
 		totalSpentStr, err := misc.FormatCurrency(totalSpent)
@@ -103,7 +140,7 @@ var summarizeExpenses = &cobra.Command{
 			log.Fatalf("Error formatting total spent: %s\n\n", err.Error())
 		}
 
-		fmt.Printf("IN TOTAL: %s over %d transactions\n\n", totalSpentStr, totalTxs)
+		fmt.Printf("IN TOTAL: %s over %d transactions\n\n", totalSpentStr, len(queriedExpenses))
 
 		if err := cursor.Err(); err != nil {
 			log.Fatalf(err.Error())
