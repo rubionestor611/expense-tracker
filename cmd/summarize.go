@@ -21,6 +21,7 @@ import (
 )
 
 var (
+	filterYear     string
 	filterMonth    string
 	filterCategory string
 	filterStore    string
@@ -45,8 +46,13 @@ var summarizeExpenses = &cobra.Command{
 		// get expenses collection
 		expensesCollection := expenses.ExpensesCollection()
 		// format date if it is defined and provided
+		if filterMonth != "" && filterYear != "" {
+			log.Fatalf("You must define either the month range or the year range. Not both.")
+		}
 		if filterMonth != "" {
+			// for is to allow manual input to redefine the month range
 			for {
+				fmt.Print("here")
 				startDate, endDate, err := misc.GetMonthRange(filterMonth)
 				if err != nil {
 					fmt.Println(err.Error())
@@ -59,6 +65,29 @@ var summarizeExpenses = &cobra.Command{
 					"$lte": endDate,
 				}
 				break
+			}
+		}
+		if filterYear != "" {
+			for {
+				if !misc.IsValidYYYY(filterYear) {
+					filterYear = prompter.PromptUserFreeForm("What is the year you wish to get your expense summary for? Please provide a 4-digit year:")
+					continue
+				}
+				break
+			}
+
+			startDate, err := time.Parse(time.RFC3339, fmt.Sprintf("%s-01-01T00:00:00Z", filterYear))
+			if err != nil {
+				log.Fatalf("Error parsing start date for query", err.Error())
+			}
+			endDate, err := time.Parse(time.RFC3339, fmt.Sprintf("%s-12-31T00:00:00Z", filterYear))
+			if err != nil {
+				log.Fatalf("Error parsing end date for query", err.Error())
+			}
+
+			filter["date"] = bson.M{
+				"$gte": startDate,
+				"$lte": endDate,
 			}
 		}
 
@@ -279,6 +308,7 @@ func closeExcel() {
 }
 
 func init() {
+	summarizeExpenses.Flags().StringVarP(&filterYear, "year", "y", "", "Specify the year to get a summary for (YY)")
 	summarizeExpenses.Flags().StringVarP(&filterMonth, "month", "m", "", "Specify the month to get a summary for (MM-YY)")
 	summarizeExpenses.Flags().StringVarP(&filterCategory, "category", "c", "", "Specify the category to get a summary for")
 	summarizeExpenses.Flags().StringVarP(&filterStore, "store", "s", "", "Specify the store in which your summary will apply to")

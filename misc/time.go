@@ -6,6 +6,7 @@ package misc
 import (
 	"fmt"
 	"regexp"
+	"strconv"
 	"time"
 )
 
@@ -25,6 +26,19 @@ func ISOFormat(timeVal time.Time) string {
 func IsValidMMYY(dateStr string) bool {
 	re := regexp.MustCompile(`^(0[1-9]|1[0-2])-\d{2}$`)
 	return re.MatchString(dateStr)
+}
+
+func IsValidYYYY(yearStr string) bool {
+	if len(yearStr) != 4 {
+		return false
+	}
+
+	_, err := strconv.Atoi(yearStr)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 func GetMonthRange(dateStr string) (time.Time, time.Time, error) {
