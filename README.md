@@ -18,3 +18,10 @@ After any expense(s), I open a terminal and quickly type my command `expense-tra
 * Golang CLI library used to define structure of CLI
 ### MongoDB
 * Database for storing expenses and categories of expenses
+
+## Building CLI
+Thankfully this is a simple 2-step process!
+1. go build -o expense-tracker
+2. go install
+
+Ta-da! Now a restarted terminal environment will have the CLI running
