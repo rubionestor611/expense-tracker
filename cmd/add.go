@@ -15,6 +15,7 @@ import (
 
 var (
 	today    bool
+	date     string
 	amount   float64
 	category string
 	store    string
@@ -39,7 +40,32 @@ var addExpenseCmd = &cobra.Command{
 			Store:    store,
 		}
 
-		if !today {
+		if len(date) > 0 {
+			for {
+				parsedDate, err := time.Parse("01-02-2006", date)
+				if err != nil {
+					todayOverlapMessage := ""
+					if today {
+						todayOverlapMessage = "\nP.S. if it happened today, the --today or -t flags are enough to indicate that"
+					}
+					fmt.Printf("There was an error parsing your date. It must be in the mm-dd-yyyy format.%s\n\n", todayOverlapMessage)
+					date = prompter.PromptUserFreeForm("Enter the date in MM-DD-YYYY format:")
+					continue
+				}
+
+				// if they are the same anyways
+				if parsedDate.Equal(submittingExpense.Date) {
+					if today {
+						fmt.Printf("As a side note. You can use only today flag or the date flag. Both are not needed")
+					} else {
+						fmt.Printf("You provided today's date. For future reference, you have the -t / --today flags at your disposal\n\n")
+					}
+				}
+
+				submittingExpense.Date = parsedDate
+				break
+			}
+		} else if !today {
 			for {
 				userInput := prompter.PromptUserFreeForm("Enter the date in MM-DD-YYYY format:")
 				parsedDate, err := time.Parse("01-02-2006", userInput)
@@ -108,6 +134,7 @@ var addExpenseCmd = &cobra.Command{
 
 func init() {
 	addExpenseCmd.Flags().BoolVarP(&today, "today", "t", false, "Mark the expense as having happened today")
+	addExpenseCmd.Flags().StringVarP(&date, "date", "d", "", "Define the date the expense occurred")
 	addExpenseCmd.Flags().Float64VarP(&amount, "amount", "a", 0, "Specify the amount of the transaction")
 	addExpenseCmd.Flags().StringVarP(&category, "category", "c", "", "Specify the category that the transaction falls under. If no match found, you will be prompted again")
 	addExpenseCmd.Flags().StringVarP(&store, "store", "s", "", "Specify the store in which the expense was made")

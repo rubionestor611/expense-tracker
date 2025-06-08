@@ -18,6 +18,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/xuri/excelize/v2"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var (
@@ -52,7 +53,6 @@ var summarizeExpenses = &cobra.Command{
 		if filterMonth != "" {
 			// for is to allow manual input to redefine the month range
 			for {
-				fmt.Print("here")
 				startDate, endDate, err := misc.GetMonthRange(filterMonth)
 				if err != nil {
 					fmt.Println(err.Error())
@@ -112,8 +112,10 @@ var summarizeExpenses = &cobra.Command{
 			filter["store"] = store
 		}
 
+		findOptions := options.Find().SetSort(bson.D{{Key: "date", Value: -1}})
+
 		// make the query
-		cursor, err := expensesCollection.Find(context.TODO(), filter)
+		cursor, err := expensesCollection.Find(context.TODO(), filter, findOptions)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}
